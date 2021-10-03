@@ -1,0 +1,5 @@
+mutation Like($inputLikeValue: LikeType!, $productId: Int!) {
+	like(inputLikeValue: $inputLikeValue, productId: $productId) {
+		...productMutationResponse
+	}
+}

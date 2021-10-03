@@ -8,7 +8,7 @@ export const checkAuth: MiddlewareFn<Context> = (
 ) => {
 	if (!req.session.userId)
 		throw new AuthenticationError(
-			'Not authenticated to perform GraphQL operations'
+			'Người dùng chưa đăng nhập, xin vui lòng đăng nhập'
 		)
 
 	return next()

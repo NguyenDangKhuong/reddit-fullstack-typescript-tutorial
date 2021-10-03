@@ -9,7 +9,7 @@ import {
 // import { concatPagination } from '@apollo/client/utilities'
 import merge from 'deepmerge'
 import isEqual from 'lodash/isEqual'
-import { Post } from '../generated/graphql'
+import { Product } from '../generated/graphql'
 import { IncomingHttpHeaders } from 'http'
 import fetch from 'isomorphic-unfetch'
 import { onError } from '@apollo/client/link/error'
@@ -64,24 +64,25 @@ function createApolloClient(headers: IncomingHttpHeaders | null = null) {
 			typePolicies: {
 				Query: {
 					fields: {
-						posts: {
+						products: {
 							keyArgs: false,
 							merge(existing, incoming) {
-								let paginatedPosts: Post[] = []
+								// merge cái hiện có với cái mới để lấy thêm sản phẩm khi nhấn xem thêm
+								let paginatedProducts: Product[] = []
 
-								if (existing && existing.paginatedPosts) {
-									paginatedPosts = paginatedPosts.concat(
-										existing.paginatedPosts
+								if (existing && existing.paginatedProducts) {
+									paginatedProducts = paginatedProducts.concat(
+										existing.paginatedProducts
 									)
 								}
 
-								if (incoming && incoming.paginatedPosts) {
-									paginatedPosts = paginatedPosts.concat(
-										incoming.paginatedPosts
+								if (incoming && incoming.paginatedProducts) {
+									paginatedProducts = paginatedProducts.concat(
+										incoming.paginatedProducts
 									)
 								}
 
-								return { ...incoming, paginatedPosts }
+								return { ...incoming, paginatedProducts }
 							}
 						}
 					}

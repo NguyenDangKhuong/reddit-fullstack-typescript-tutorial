@@ -1,0 +1,15 @@
+fragment productWithCategoryInfo on Product {
+  id
+  title
+  description
+  price
+  points
+  likeType
+  user {
+    username
+    id
+  }
+  category {
+    title
+  }
+}

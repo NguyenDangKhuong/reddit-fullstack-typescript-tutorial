@@ -9,17 +9,17 @@ import {
 	Root
 } from 'type-graphql'
 import argon2 from 'argon2'
-import { UserMutationResponse } from '../types/UserMutationResponse'
-import { RegisterInput } from '../types/RegisterInput'
+import { UserMutationResponse } from '../types/users/UserMutationResponse'
+import { RegisterInput } from '../types/users/RegisterInput'
 import { validateRegisterInput } from '../utils/validateRegisterInput'
-import { LoginInput } from '../types/LoginInput'
+import { LoginInput } from '../types/users/LoginInput'
 import { Context } from '../types/Context'
 import { COOKIE_NAME } from '../constants'
-import { ForgotPasswordInput } from '../types/ForgotPassword'
+import { ForgotPasswordInput } from '../types/users/ForgotPassword'
 import { sendEmail } from '../utils/sendEmail'
 import { TokenModel } from '../models/Token'
 import { v4 as uuidv4 } from 'uuid'
-import { ChangePasswordInput } from '../types/ChangePasswordInput'
+import { ChangePasswordInput } from '../types/users/ChangePasswordInput'
 
 @Resolver(_of => User)
 export class UserResolver {
@@ -53,13 +53,13 @@ export class UserResolver {
 				return {
 					code: 400,
 					success: false,
-					message: 'Duplicated username or email',
+					message: 'Tên người dùng hoác email đã được đăng kí',
 					errors: [
 						{
 							field: existingUser.username === username ? 'username' : 'email',
 							message: `${
 								existingUser.username === username ? 'Username' : 'Email'
-							} already taken`
+							} đã được dùng`
 						}
 					]
 				}
@@ -79,7 +79,7 @@ export class UserResolver {
 			return {
 				code: 200,
 				success: true,
-				message: 'User registration successful',
+				message: 'Đã đăng kí tài khoản thành công',
 				user: newUser
 			}
 		} catch (error) {
@@ -87,7 +87,7 @@ export class UserResolver {
 			return {
 				code: 500,
 				success: false,
-				message: `Internal server error ${error.message}`
+				message: `Lỗi hệ thống: ${error.message}`
 			}
 		}
 	}
@@ -108,9 +108,9 @@ export class UserResolver {
 				return {
 					code: 400,
 					success: false,
-					message: 'User not found',
+					message: 'Tài khoản không tồn tại',
 					errors: [
-						{ field: 'usernameOrEmail', message: 'Username or email incorrect' }
+						{ field: 'usernameOrEmail', message: 'Tài khoản đăng nhập không đúng' }
 					]
 				}
 
@@ -120,8 +120,8 @@ export class UserResolver {
 				return {
 					code: 400,
 					success: false,
-					message: 'Wrong password',
-					errors: [{ field: 'password', message: 'Wrong password' }]
+					message: 'Password đã nhập sai',
+					errors: [{ field: 'password', message: 'Password đã nhập sai' }]
 				}
 
 			// Create session and return cookie
@@ -130,7 +130,7 @@ export class UserResolver {
 			return {
 				code: 200,
 				success: true,
-				message: 'Logged in successfully',
+				message: 'Đăng nhập thành công',
 				user: existingUser
 			}
 		} catch (error) {
@@ -138,7 +138,7 @@ export class UserResolver {
 			return {
 				code: 500,
 				success: false,
-				message: `Internal server error ${error.message}`
+				message: `Lỗi hệ thống: ${error.message}`
 			}
 		}
 	}
@@ -150,7 +150,7 @@ export class UserResolver {
 
 			req.session.destroy(error => {
 				if (error) {
-					console.log('DESTROYING SESSION ERROR', error)
+					console.log('Lỗi huỷ session:', error)
 					resolve(false)
 				}
 				resolve(true)
@@ -180,7 +180,7 @@ export class UserResolver {
 		// send reset password link to user via email
 		await sendEmail(
 			forgotPasswordInput.email,
-			`<a href="http://localhost:3000/change-password?token=${resetToken}&userId=${user.id}">Click here to reset your password</a>`
+			`<a href="http://localhost:3001/change-password?token=${resetToken}&userId=${user.id}">Bấm vào đây để sửa mật khẩu của bạn</a>`
 		)
 
 		return true
@@ -197,9 +197,9 @@ export class UserResolver {
 			return {
 				code: 400,
 				success: false,
-				message: 'Invalid password',
+				message: 'Sai mật khẩu',
 				errors: [
-					{ field: 'newPassword', message: 'Length must be greater than 2' }
+					{ field: 'newPassword', message: 'Mật khẩu phải lớn hơn 2' }
 				]
 			}
 		}
@@ -210,11 +210,11 @@ export class UserResolver {
 				return {
 					code: 400,
 					success: false,
-					message: 'Invalid or expired password reset token',
+					message: 'Token đổi mật khẩu không đúng hoặc đã hết hạn',
 					errors: [
 						{
 							field: 'token',
-							message: 'Invalid or expired password reset token'
+							message: 'Token đổi mật khẩu không đúng hoặc đã hết hạn'
 						}
 					]
 				}
@@ -229,11 +229,11 @@ export class UserResolver {
 				return {
 					code: 400,
 					success: false,
-					message: 'Invalid or expired password reset token',
+					message: 'Token đổi mật khẩu không đúng hoặc đã hết hạn',
 					errors: [
 						{
 							field: 'token',
-							message: 'Invalid or expired password reset token'
+							message: 'Token đổi mật khẩu không đúng hoặc đã hết hạn'
 						}
 					]
 				}
@@ -246,8 +246,8 @@ export class UserResolver {
 				return {
 					code: 400,
 					success: false,
-					message: 'User no longer exists',
-					errors: [{ field: 'token', message: 'User no longer exists' }]
+					message: 'Tài khoản người dùng không còn tồn tại',
+					errors: [{ field: 'token', message: 'Tài khoản người dùng không còn tồn tại' }]
 				}
 			}
 
@@ -261,7 +261,7 @@ export class UserResolver {
 			return {
 				code: 200,
 				success: true,
-				message: 'User password reset successfully',
+				message: 'Reset password thành công',
 				user
 			}
 		} catch (error) {
@@ -269,7 +269,7 @@ export class UserResolver {
 			return {
 				code: 500,
 				success: false,
-				message: `Internal server error ${error.message}`
+				message: `Lỗi hệ thống: ${error.message}`
 			}
 		}
 	}

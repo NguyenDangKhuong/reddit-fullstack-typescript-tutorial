@@ -1,6 +1,4 @@
-//type script voi graphql
 import { Field, ID, ObjectType } from 'type-graphql'
-// type script voi postgre
 import {
   BaseEntity,
   Column,
@@ -10,36 +8,22 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn
 } from 'typeorm'
-import { Like } from './Like'
 import { Product } from './Product'
 
 @ObjectType()
 @Entity()
-export class User extends BaseEntity {
+export class Category extends BaseEntity {
   @Field(_type => ID)
   @PrimaryGeneratedColumn()
   id!: number
 
   @Field()
-  @Column({ unique: true })
-  username!: string
-
-  @Field()
-  @Column({ unique: true })
-  email!: string
-
-  @Field()
-  @Column({ nullable: true })
-  role!: number
-
   @Column()
-  password!: string
+  title!: string
 
-  @OneToMany(() => Product, product => product.user)
+  @Field(_type => [Product])
+  @OneToMany(() => Product, product => product.category)
   products: Product[]
-
-  @OneToMany(_to => Like, like => like.user)
-  likes: Like[]
 
   @Field()
   @CreateDateColumn()

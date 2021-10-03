@@ -1,10 +1,10 @@
 import { useRouter } from 'next/router'
 import Layout from '../../../components/Layout'
 import {
-	UpdatePostInput,
+	UpdateProductInput,
 	useMeQuery,
-	usePostQuery,
-	useUpdatePostMutation
+	useProductQuery,
+	useUpdateProductMutation
 } from '../../../generated/graphql'
 import {
 	Alert,
@@ -19,23 +19,23 @@ import NextLink from 'next/link'
 import { Formik, Form } from 'formik'
 import InputField from '../../../components/InputField'
 
-const PostEdit = () => {
+const ProductEdit = () => {
 	const router = useRouter()
-	const postId = router.query.id as string
+	const productId = router.query.id as string
 
 	const { data: meData, loading: meLoading } = useMeQuery()
 
-	const { data: postData, loading: postLoading } = usePostQuery({
-		variables: { id: postId }
+	const { data: productData, loading: productLoading } = useProductQuery({
+		variables: { id: productId }
 	})
 
-	const [updatePost, _] = useUpdatePostMutation()
+	const [updateProduct, _] = useUpdateProductMutation()
 
-	const onUpdatePostSubmit = async (values: Omit<UpdatePostInput, 'id'>) => {
-		await updatePost({
+	const onUpdateProductSubmit = async (values: Omit<UpdateProductInput, 'id'>) => {
+		await updateProduct({
 			variables: {
-				updatePostInput: {
-					id: postId,
+				updateProductInput: {
+					id: productId,
 					...values
 				}
 			}
@@ -43,7 +43,7 @@ const PostEdit = () => {
 		router.back()
 	}
 
-	if (meLoading || postLoading)
+	if (meLoading || productLoading)
 		return (
 			<Layout>
 				<Flex justifyContent='center' alignItems='center' minH='100vh'>
@@ -52,12 +52,12 @@ const PostEdit = () => {
 			</Layout>
 		)
 
-	if (!postData?.post)
+	if (!productData?.product)
 		return (
 			<Layout>
 				<Alert status='error'>
 					<AlertIcon />
-					<AlertTitle>Post not found</AlertTitle>
+					<AlertTitle>Product not found</AlertTitle>
 				</Alert>
 				<Box mt={4}>
 					<NextLink href='/'>
@@ -67,11 +67,15 @@ const PostEdit = () => {
 			</Layout>
 		)
 
-	if (
-		!meLoading &&
-		!postLoading &&
-		meData?.me?.id !== postData?.post?.userId.toString()
-	)
+		if (
+			!meLoading &&
+			!productLoading &&
+			!meData?.me?.id
+
+
+			// kiểm tra xem có phải sản phẩm chính chủ không
+			// !== productData?.product?.userId.toString()
+		)
 		return (
 			<Layout>
 				<Alert status='error'>
@@ -87,13 +91,15 @@ const PostEdit = () => {
 		)
 
 	const initialValues = {
-		title: postData.post.title,
-		text: postData.post.text
+		title: productData.product.title,
+    description: productData.product.description,
+    price: productData.product.price,
+    categoryId: productData.product.categoryId
 	}
 
 	return (
 		<Layout>
-			<Formik initialValues={initialValues} onSubmit={onUpdatePostSubmit}>
+			<Formik initialValues={initialValues} onSubmit={onUpdateProductSubmit}>
 				{({ isSubmitting }) => (
 					<Form>
 						<InputField
@@ -115,7 +121,7 @@ const PostEdit = () => {
 
 						<Flex justifyContent='space-between' alignItems='center' mt={4}>
 							<Button type='submit' colorScheme='teal' isLoading={isSubmitting}>
-								Update Post
+								Update Product
 							</Button>
 							<NextLink href='/'>
 								<Button>Back to Homepage</Button>
@@ -128,4 +134,4 @@ const PostEdit = () => {
 	)
 }
 
-export default PostEdit
+export default ProductEdit

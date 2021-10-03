@@ -12,20 +12,20 @@ import { GetStaticPaths, GetStaticProps } from 'next'
 import { useRouter } from 'next/router'
 import Layout from '../../components/Layout'
 import {
-	PostDocument,
-	PostIdsDocument,
-	PostIdsQuery,
-	PostQuery,
-	usePostQuery
+	ProductDocument,
+	ProductIdsDocument,
+	ProductIdsQuery,
+	ProductQuery,
+	useProductQuery
 } from '../../generated/graphql'
 import { addApolloState, initializeApollo } from '../../lib/apolloClient'
 import { limit } from '../index'
 import NextLink from 'next/link'
-import PostEditDeleteButtons from '../../components/PostEditDeleteButtons'
+// import ProductEditDeleteButtons from '../../components/ProductEditDeleteButtons'
 
-const Post = () => {
+const Product = () => {
 	const router = useRouter()
-	const { data, loading, error } = usePostQuery({
+	const { data, loading, error } = useProductQuery({
 		variables: { id: router.query.id as string }
 	})
 
@@ -38,12 +38,12 @@ const Post = () => {
 			</Layout>
 		)
 
-	if (error || !data?.post)
+	if (error || !data?.product)
 		return (
 			<Layout>
 				<Alert status='error'>
 					<AlertIcon />
-					<AlertTitle>{error ? error.message : 'Post not found'}</AlertTitle>
+					<AlertTitle>{error ? error.message : 'Product not found'}</AlertTitle>
 				</Alert>
 				<Box mt={4}>
 					<NextLink href='/'>
@@ -55,13 +55,13 @@ const Post = () => {
 
 	return (
 		<Layout>
-			<Heading mb={4}>{data.post.title}</Heading>
-			<Box mb={4}>{data.post.text}</Box>
+			<Heading mb={4}>{data.product.title}</Heading>
+			<Box mb={4}>{data.product.text}</Box>
 			<Flex justifyContent='space-between' alignItems='center'>
-				<PostEditDeleteButtons
-					postId={data.post.id}
-					postUserId={data.post.userId.toString()}
-				/>
+				{/* <ProductEditDeleteButtons
+					productId={data.product.id}
+					productUserId={data.product.userId.toString()}
+				/> */}
 				<NextLink href='/'>
 					<Button>Back to Homepage</Button>
 				</NextLink>
@@ -78,14 +78,14 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
 	const apolloClient = initializeApollo()
 
-	const { data } = await apolloClient.query<PostIdsQuery>({
-		query: PostIdsDocument,
+	const { data } = await apolloClient.query<ProductIdsQuery>({
+		query: ProductIdsDocument,
 		variables: { limit }
 	})
 
 	return {
-		paths: data.posts!.paginatedPosts.map(post => ({
-			params: { id: `${post.id}` }
+		paths: data.products!.paginatedProducts.map(product => ({
+			params: { id: `${product.id}` }
 		})),
 		fallback: 'blocking'
 	}
@@ -97,12 +97,12 @@ export const getStaticProps: GetStaticProps<
 > = async ({ params }) => {
 	const apolloClient = initializeApollo()
 
-	await apolloClient.query<PostQuery>({
-		query: PostDocument,
+	await apolloClient.query<ProductQuery>({
+		query: ProductDocument,
 		variables: { id: params?.id }
 	})
 
 	return addApolloState(apolloClient, { props: {} })
 }
 
-export default Post
+export default Product

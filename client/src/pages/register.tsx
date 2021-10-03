@@ -48,7 +48,7 @@ const Register = () => {
 		} else if (response.data?.register.user) {
 			// register successfully
 			toast({
-				title: 'Welcome',
+				title: 'Chào mừng',
 				description: `${response.data.register.user.username}`,
 				status: 'success',
 				duration: 3000,
@@ -66,14 +66,14 @@ const Register = () => {
 				</Flex>
 			) : (
 				<Wrapper size='small'>
-					{error && <p>Failed to register. Internal server error</p>}
+					{error && <p>Đăng kí thất bại. Lỗi hệ thống.</p>}
 					<Formik initialValues={initialValues} onSubmit={onRegisterSubmit}>
 						{({ isSubmitting }) => (
 							<Form>
 								<InputField
 									name='username'
-									placeholder='Username'
-									label='Username'
+									placeholder='Tên Đăng Nhập'
+									label='Tên Đăng Nhập'
 									type='text'
 								/>
 								<Box mt={4}>
@@ -87,8 +87,8 @@ const Register = () => {
 								<Box mt={4}>
 									<InputField
 										name='password'
-										placeholder='Password'
-										label='Password'
+										placeholder='Mật khẩu'
+										label='Mật khẩu'
 										type='password'
 									/>
 								</Box>
@@ -98,7 +98,7 @@ const Register = () => {
 									mt={4}
 									isLoading={isSubmitting}
 								>
-									Register
+									Đăng kí
 								</Button>
 							</Form>
 						)}

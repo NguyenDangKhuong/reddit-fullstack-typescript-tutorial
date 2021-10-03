@@ -1,0 +1,5 @@
+mutation UpdateProduct($updateProductInput: UpdateProductInput!) {
+	updateProduct(updateProductInput: $updateProductInput) {
+		...productMutationResponse
+	}
+}

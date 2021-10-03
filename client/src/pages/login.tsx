@@ -34,11 +34,12 @@ const Login = () => {
 				loginInput: values
 			},
 			update(cache, { data }) {
-				console.log('DATA LOGIN', data)
+				// console.log('DATA LOGIN', data)
 
-				// const meData = cache.readQuery({ query: MeDocument })
-				// console.log('MEDATA', meData)
+        // const meData = cache.readQuery({ query: MeDocument })
+        // console.log('MEDATA', meData)
 
+        //querry lại data me để check user đăng nhập chưa
 				if (data?.login.success) {
 					cache.writeQuery<MeQuery>({
 						query: MeDocument,
@@ -53,7 +54,7 @@ const Login = () => {
 		} else if (response.data?.login.user) {
 			// register successfully
 			toast({
-				title: 'Welcome',
+				title: 'Chào mừng trở lại',
 				description: `${response.data.login.user.username}`,
 				status: 'success',
 				duration: 3000,
@@ -75,29 +76,29 @@ const Login = () => {
 				</Flex>
 			) : (
 				<Wrapper size='small'>
-					{error && <p>Failed to login. Internal server error.</p>}
+					{error && <p>Đăng nhập thất bại. Lỗi hệ thống.</p>}
 					<Formik initialValues={initialValues} onSubmit={onLoginSubmit}>
 						{({ isSubmitting }) => (
 							<Form>
 								<InputField
 									name='usernameOrEmail'
-									placeholder='Username or Email'
-									label='Username or Email'
+									placeholder='Tên Đăng Nhập hoặc Email'
+									label='Tên Đăng Nhập hoặc Email'
 									type='text'
 								/>
 
 								<Box mt={4}>
 									<InputField
 										name='password'
-										placeholder='Password'
-										label='Password'
+										placeholder='Mật khẩu'
+										label='Mật khẩu'
 										type='password'
 									/>
 								</Box>
 
 								<Flex mt={2}>
 									<NextLink href='/forgot-password'>
-										<Link ml='auto'>Forgot Password</Link>
+										<Link ml='auto'>Quên mật khẩu</Link>
 									</NextLink>
 								</Flex>
 
@@ -107,7 +108,7 @@ const Login = () => {
 									mt={4}
 									isLoading={isSubmitting}
 								>
-									Login
+									Đăng nhập
 								</Button>
 							</Form>
 						)}

@@ -1,24 +1,27 @@
 require('dotenv').config()
-import 'reflect-metadata'
-import express from 'express'
-import { createConnection } from 'typeorm'
-import { User } from './entities/User'
-import { Post } from './entities/Post'
-import { ApolloServer } from 'apollo-server-express'
-import { buildSchema } from 'type-graphql'
-import { HelloResolver } from './resolvers/hello'
-import { UserResolver } from './resolvers/user'
-import mongoose from 'mongoose'
-import MongoStore from 'connect-mongo'
-import session from 'express-session'
-import { COOKIE_NAME, __prod__ } from './constants'
-import { Context } from './types/Context'
-import { PostResolver } from './resolvers/post'
 import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core'
+import { ApolloServer } from 'apollo-server-express'
+import MongoStore from 'connect-mongo'
 import cors from 'cors'
-import { Upvote } from './entities/Upvote'
-import { buildDataLoaders } from './utils/dataLoaders'
+import express from 'express'
+import session from 'express-session'
+import mongoose from 'mongoose'
 import path from 'path'
+import 'reflect-metadata'
+import { buildSchema } from 'type-graphql'
+import { createConnection } from 'typeorm'
+import { COOKIE_NAME, __prod__ } from './constants'
+import { Category } from './entities/Category'
+import { Like } from './entities/Like'
+import { Product } from './entities/Product'
+import { User } from './entities/User'
+import { CategoryResolver } from './resolvers/category'
+import { HelloResolver } from './resolvers/hello'
+import { ProductResolver } from './resolvers/product'
+import { UserResolver } from './resolvers/user'
+import { Context } from './types/Context'
+import { buildDataLoaders } from './utils/dataLoaders'
+import { sendEmail } from './utils/sendEmail'
 
 const main = async () => {
 	const connection = await createConnection({
@@ -26,7 +29,7 @@ const main = async () => {
 		...(__prod__
 			? { url: process.env.DATABASE_URL }
 			: {
-					database: 'reddit',
+					database: 'racroishop',
 					username: process.env.DB_USERNAME_DEV,
 					password: process.env.DB_PASSWORD_DEV
 			  }),
@@ -42,9 +45,11 @@ const main = async () => {
 			  }
 			: {}),
 		...(__prod__ ? {} : { synchronize: true }),
-		entities: [User, Post, Upvote],
+		entities: [User, Product, Like, Category],
 		migrations: [path.join(__dirname, '/migrations/*')]
 	})
+
+	await sendEmail('khuong@gmail.com', '<b>Hello Khuong</b>')
 
 	if (__prod__) await connection.runMigrations()
 
@@ -52,15 +57,13 @@ const main = async () => {
 
 	app.use(
 		cors({
-			origin: __prod__
-				? process.env.CORS_ORIGIN_PROD
-				: process.env.CORS_ORIGIN_DEV,
+			origin: 'http://localhost:3001',
 			credentials: true
 		})
 	)
 
 	// Session/Cookie store
-	const mongoUrl = `mongodb+srv://${process.env.SESSION_DB_USERNAME_DEV_PROD}:${process.env.SESSION_DB_PASSWORD_DEV_PROD}@reddit.d1jnu.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`
+	const mongoUrl = `mongodb+srv://${process.env.SESSION_DB_USERNAME_DEV_PROD}:${process.env.SESSION_DB_PASSWORD_DEV_PROD}@racroishop.c68ga.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`
 	await mongoose.connect(mongoUrl, {
 		useCreateIndex: true,
 		useNewUrlParser: true,
@@ -80,7 +83,7 @@ const main = async () => {
 				maxAge: 1000 * 60 * 60, // one hour
 				httpOnly: true, // JS front end cannot access the cookie
 				secure: __prod__, // cookie only works in https
-				sameSite: 'none'
+				sameSite: 'lax'
 			},
 			secret: process.env.SESSION_SECRET_DEV_PROD as string,
 			saveUninitialized: false, // don't save empty sessions, right from the start
@@ -90,7 +93,7 @@ const main = async () => {
 
 	const apolloServer = new ApolloServer({
 		schema: await buildSchema({
-			resolvers: [HelloResolver, UserResolver, PostResolver],
+			resolvers: [HelloResolver, UserResolver, ProductResolver, CategoryResolver],
 			validate: false
 		}),
 		context: ({ req, res }): Context => ({

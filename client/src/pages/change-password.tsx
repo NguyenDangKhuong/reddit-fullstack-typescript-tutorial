@@ -78,12 +78,12 @@ const ChangePassword = () => {
 			<Wrapper size='small'>
 				<Alert status='error'>
 					<AlertIcon />
-					<AlertTitle>Invalid password change request</AlertTitle>
+					<AlertTitle>Yêu cầu thay đổi mật khẩu không đúng</AlertTitle>
 				</Alert>
 
 				<Flex mt={2}>
 					<NextLink href='/login'>
-						<Link ml='auto'>Back to Login</Link>
+						<Link ml='auto'>Trở về trang đăng nhập</Link>
 					</NextLink>
 				</Flex>
 			</Wrapper>
@@ -106,7 +106,7 @@ const ChangePassword = () => {
 										{tokenError}
 									</Box>
 									<NextLink href='/forgot-password'>
-										<Link>Go back to Forgot Password</Link>
+										<Link>Trở về trang quên mật khẩu</Link>
 									</NextLink>
 								</Flex>
 							)}
@@ -116,7 +116,7 @@ const ChangePassword = () => {
 								mt={4}
 								isLoading={isSubmitting}
 							>
-								Change Password
+								Đổi mật khẩu
 							</Button>
 						</Form>
 					)}

@@ -1,7 +1,7 @@
-fragment postMutationResponse on PostMutationResponse {
-	...postMutationStatuses
-	post {
-		...postWithUserInfo
+fragment productMutationResponse on ProductMutationResponse {
+	...productMutationStatuses
+	product {
+		...productWithCategoryInfo
 	}
 	errors {
 		...fieldError

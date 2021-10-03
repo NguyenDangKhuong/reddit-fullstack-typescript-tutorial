@@ -23,17 +23,17 @@ const Navbar = () => {
 
 					cache.modify({
 						fields: {
-							posts(existing) {
-								existing.paginatedPosts.forEach((post: Reference) => {
+							products(existing) {
+								existing.paginatedProducts.forEach((product: Reference) => {
 									cache.writeFragment({
-										id: post.__ref, // `Post:17`
+										id: product.__ref, // `Product:17`
 										fragment: gql`
-											fragment VoteType on Post {
-												voteType
+											fragment LikeType on Product {
+												likeType
 											}
 										`,
 										data: {
-											voteType: 0
+											likeType: 0
 										}
 									})
 								})
@@ -55,21 +55,21 @@ const Navbar = () => {
 		body = (
 			<>
 				<NextLink href='/login'>
-					<Link mr={2}>Login</Link>
+					<Link mr={2}>Đăng nhập</Link>
 				</NextLink>
 				<NextLink href='/register'>
-					<Link>Register</Link>
+					<Link>Đăng kí</Link>
 				</NextLink>
 			</>
 		)
 	} else {
 		body = (
 			<Flex>
-				<NextLink href='/create-post'>
-					<Button mr={4}>Create Post</Button>
+				<NextLink href='/create-product'>
+					<Button mr={4}>Tạo sản phẩm</Button>
 				</NextLink>
 				<Button onClick={logoutUser} isLoading={useLogoutMutationLoading}>
-					Logout
+					Đăng xuất
 				</Button>
 			</Flex>
 		)
@@ -79,7 +79,7 @@ const Navbar = () => {
 		<Box bg='tan' p={4}>
 			<Flex maxW={800} justifyContent='space-between' align='center' m='auto'>
 				<NextLink href='/'>
-					<Heading>Reddit</Heading>
+					<Heading>Rắc Rối Shop</Heading>
 				</NextLink>
 				<Box>{body}</Box>
 			</Flex>

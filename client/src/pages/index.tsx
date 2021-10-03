@@ -12,50 +12,49 @@ import {
 import { GetServerSideProps, GetServerSidePropsContext } from 'next'
 import NextLink from 'next/link'
 import Layout from '../components/Layout'
-import PostEditDeleteButtons from '../components/PostEditDeleteButtons'
-import { PostsDocument, usePostsQuery } from '../generated/graphql'
+import ProductEditDeleteButtons from '../components/ProductEditDeleteButtons'
+import { ProductsDocument, useProductsQuery } from '../generated/graphql'
 import { addApolloState, initializeApollo } from '../lib/apolloClient'
-import UpvoteSection from '../components/UpvoteSection'
+import LikeSection from '../components/LikeSection'
 
 export const limit = 3
 
 const Index = () => {
-	const { data, loading, fetchMore, networkStatus } = usePostsQuery({
+	const { data, loading, fetchMore, networkStatus } = useProductsQuery({
 		variables: { limit },
 
-		// component nao render boi cai Posts query, se rerender khi networkStatus thay doi, tuc la fetchMore
+		// component nao render boi cai Products query, se rerender khi networkStatus thay doi, tuc la fetchMore
 		notifyOnNetworkStatusChange: true
 	})
 
-	const loadingMorePosts = networkStatus === NetworkStatus.fetchMore
+	const loadingMoreProducts = networkStatus === NetworkStatus.fetchMore
 
-	const loadMorePosts = () =>
-		fetchMore({ variables: { cursor: data?.posts?.cursor } })
+	const loadMoreProducts = () => fetchMore({ variables: { cursor: data?.products?.cursor } })
 
 	return (
 		<Layout>
-			{loading && !loadingMorePosts ? (
+			{loading && !loadingMoreProducts ? (
 				<Flex justifyContent='center' alignItems='center' minH='100vh'>
 					<Spinner />
 				</Flex>
 			) : (
 				<Stack spacing={8}>
-					{data?.posts?.paginatedPosts.map(post => (
-						<Flex key={post.id} p={5} shadow='md' borderWidth='1px'>
-							<UpvoteSection post={post} />
+					{data?.products?.paginatedProducts.map(product => (
+						<Flex key={product.id} p={5} shadow='md' borderWidth='1px'>
+							<LikeSection product={product} />
 							<Box flex={1}>
-								<NextLink href={`/post/${post.id}`}>
+								<NextLink href={`/product/${product.id}`}>
 									<Link>
-										<Heading fontSize='xl'>{post.title}</Heading>
+										<Heading fontSize='xl'>{product.title}</Heading>
 									</Link>
 								</NextLink>
-								<Text>posted by {post.user.username}</Text>
+								<Text>producted by {product.user.username}</Text>
 								<Flex align='center'>
-									<Text mt={4}>{post.textSnippet}</Text>
+									{/* <Text mt={4}>{product.textSnippet}</Text> */}
 									<Box ml='auto'>
-										<PostEditDeleteButtons
-											postId={post.id}
-											postUserId={post.user.id}
+										<ProductEditDeleteButtons
+											productId={product.id}
+											productUserId={product.user.id}
 										/>
 									</Box>
 								</Flex>
@@ -65,15 +64,15 @@ const Index = () => {
 				</Stack>
 			)}
 
-			{data?.posts?.hasMore && (
+			{data?.products?.hasMore && (
 				<Flex>
 					<Button
 						m='auto'
 						my={8}
-						isLoading={loadingMorePosts}
-						onClick={loadMorePosts}
+						isLoading={loadingMoreProducts}
+						onClick={loadMoreProducts}
 					>
-						{loadingMorePosts ? 'Loading' : 'Show more'}
+						{loadingMoreProducts ? 'Đang tải' : 'Xem thêm'}
 					</Button>
 				</Flex>
 			)}
@@ -87,7 +86,7 @@ export const getServerSideProps: GetServerSideProps = async (
 	const apolloClient = initializeApollo({ headers: context.req.headers })
 
 	await apolloClient.query({
-		query: PostsDocument,
+		query: ProductsDocument,
 		variables: {
 			limit
 		}
